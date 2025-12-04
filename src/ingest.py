@@ -1,4 +1,5 @@
 import json
+import uuid
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -35,11 +36,25 @@ def ingest(batch_size: int = 16) -> None:
 
     # батчами создаём вектора и отправляем в Qdrant
     for i in tqdm(range(0, len(chunks), batch_size), desc="Ingesting"):
-        batch = chunks[i : i + batch_size]
+        batch = chunks[i: i + batch_size]
 
-        ids = [item["id"] for item in batch]
+        # ID для Qdrant — UUID (строкой), чтобы пройти валидацию
+        ids = [str(uuid.uuid4()) for _ in batch]
+
         texts = [item["text"] for item in batch]
-        payloads = [item["metadata"] | {"text": item["text"]} for item in batch]
+
+        # в payload кладём:
+        # - исходные метаданные
+        # - текст
+        # - оригинальный chunk id (faq_wifi_001_chunk_000)
+        payloads = [
+            item["metadata"]
+            | {
+                "text": item["text"],
+                "chunk_id": item["id"],
+            }
+            for item in batch
+        ]
 
         vectors = emb_client.embed_batch(texts)
         vec_client.upsert_points(ids=ids, vectors=vectors, payloads=payloads)
