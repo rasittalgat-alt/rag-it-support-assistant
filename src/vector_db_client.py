@@ -72,10 +72,31 @@ class VectorDBClient:
     ):
         """
         Выполняет поиск ближайших векторов.
+
+        Возвращает список ScoredPoint (или совместимых объектов),
+        чтобы rag_pipeline мог одинаково с ними работать.
         """
-        return self.client.search(
+        # Новый API qdrant-client (1.x) – есть метод search
+        if hasattr(self.client, "search"):
+            return self.client.search(
+                collection_name=self.collection_name,
+                query_vector=query_vector,
+                limit=limit,
+                with_payload=with_payload,
+            )
+
+        # Фоллбек на query_points для старых версий
+        res = self.client.query_points(
             collection_name=self.collection_name,
             query_vector=query_vector,
             limit=limit,
             with_payload=with_payload,
         )
+
+        # В новых версиях query_points возвращает объект с полем .points
+        if hasattr(res, "points"):
+            return res.points
+
+        # На всякий случай – если вдруг уже список
+        return res
+
