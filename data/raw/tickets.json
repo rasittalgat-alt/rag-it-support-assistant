@@ -1,0 +1,30 @@
+[
+  {
+    "ticket_id": "INC-00123",
+    "category": "email",
+    "title": "Cannot access corporate email from home",
+    "description": "User reports that Outlook cannot connect to the corporate mailbox from home network.",
+    "resolution": "Explained that VPN connection is required from outside the office. Asked the user to connect to VPN and restart Outlook. After VPN connection was established, email started working."
+  },
+  {
+    "ticket_id": "INC-00124",
+    "category": "vpn",
+    "title": "VPN client shows authentication failed",
+    "description": "User cannot log in to VPN. Error 'Authentication failed' is displayed.",
+    "resolution": "Checked the user account in Active Directory and found it locked. Unlocked the account and asked the user to try again. VPN connection was established successfully."
+  },
+  {
+    "ticket_id": "INC-00125",
+    "category": "wifi",
+    "title": "Laptop cannot connect to CORP-WIFI in meeting room",
+    "description": "User can see CORP-WIFI but cannot connect in a specific meeting room.",
+    "resolution": "Asked the user to move closer to another access point and try again. Also updated the Wi-Fi driver on the laptop. Connection to CORP-WIFI was successful after driver update."
+  },
+  {
+    "ticket_id": "INC-00126",
+    "category": "printer",
+    "title": "User cannot print to network printer PRN-01",
+    "description": "Print jobs stay in queue on PRN-01 and do not print.",
+    "resolution": "Restarted the print spooler service on the print server and cleared the stuck job. After that new print jobs were processed normally. Advised the user to try printing again."
+  }
+]
