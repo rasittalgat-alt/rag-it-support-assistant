@@ -2,52 +2,36 @@ from typing import List
 from openai import OpenAI
 
 from .config import settings
+import os
+
 
 
 class EmbeddingsClient:
-    """
-    Обёртка над OpenAI Embeddings (можно заменить на DIAL при необходимости).
-    Используется для:
-    - генерации вектора для одного текста;
-    - батчевой генерации векторов для списка текстов.
-    """
+    def __init__(self):
+        # 1. Берём ключ и endpoint из переменных окружения,
+        #    которые тебе прислал ментор
+        api_key = os.getenv("AZURE_OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT", "https://ai-proxy.lab.epam.com")
+        model = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small-1")
 
-    def __init__(self, api_key: str | None = None, model: str | None = None):
-        self.api_key = api_key or settings.openai_api_key
-        self.model = model or settings.embedding_model
+        if not api_key:
+            raise ValueError("AZURE_OPENAI_API_KEY / OPENAI_API_KEY is not set.")
 
-        if not self.api_key:
-            raise ValueError(
-                "OPENAI_API_KEY is not set. "
-                "Please set it in environment variables."
-            )
+        # 2. Создаём клиента с кастомным base_url (через прокси)
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=f"{endpoint}/v1",
+        )
 
-        # Классический клиент OpenAI (новая библиотека)
-        self.client = OpenAI(api_key=self.api_key)
+        self.model = model
 
-    def embed_text(self, text: str) -> List[float]:
-        """
-        Создаёт embedding для одного текста.
-        """
+    def embed_text(self, text: str):
         response = self.client.embeddings.create(
             model=self.model,
             input=[text],
         )
-        # Берём embedding первого (и единственного) элемента
         return response.data[0].embedding
 
-    def embed_batch(self, texts: List[str]) -> List[List[float]]:
-        """
-        Создаёт embeddings для списка текстов.
-        """
-        if not texts:
-            return []
-
-        response = self.client.embeddings.create(
-            model=self.model,
-            input=texts,
-        )
-        return [item.embedding for item in response.data]
 
 
 if __name__ == "__main__":
