@@ -47,6 +47,24 @@ class EmbeddingsClient:
         return response.data[0].embedding
 
 
+    def embed_batch(self, texts: List[str]) -> List[List[float]]:
+        """
+        Получает эмбеддинги для списка текстов.
+        Порядок эмбеддингов соответствует порядку текстов.
+        """
+        if not texts:
+            return []
+
+        # ВАЖНО: параметры должны быть такими же, как в твоём embed()
+        response = self.client.embeddings.create(
+            model=self.model,   # или deployment/engine — как у тебя в embed()
+            input=texts,
+        )
+
+        return [item.embedding for item in response.data]
+
+
+
 if __name__ == "__main__":
     ec = EmbeddingsClient()
     vec = ec.embed_text("Test embedding for IT Support RAG Assistant.")
