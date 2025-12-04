@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"   # HTTP API + веб-интерфейс
+      - "6334:6334"   # gRPC (можно и не пользоваться, но пусть будет)
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    restart: unless-stopped
