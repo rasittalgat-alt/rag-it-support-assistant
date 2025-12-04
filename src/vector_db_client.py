@@ -72,13 +72,22 @@ class VectorDBClient:
     ):
         """
         Выполняет поиск ближайших векторов.
-        Использует современный метод client.search (qdrant-client 1.x).
+
+        Для qdrant-client 1.x используем метод query_points:
+        - collection_name: имя коллекции
+        - query: сам вектор запроса
+        - with_payload: вернуть payload
+        - limit: сколько результатов
         """
-        return self.client.search(
+
+        res = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
-            limit=limit,
+            query=query_vector,
             with_payload=with_payload,
+            limit=limit,
         )
+
+        # В res лежит объект с полем .points (список ScoredPoint)
+        return res.points
 
 
