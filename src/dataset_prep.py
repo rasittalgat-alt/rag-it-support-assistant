@@ -119,7 +119,6 @@ def simple_chunk_text(text: str, max_chars: int = 700, overlap: int = 100) -> Li
     """
     Очень простой чанкер: режет текст на куски по max_chars
     с перекрытием overlap символов.
-    Для учебного проекта достаточно.
     """
     text = text.strip()
     if not text:
