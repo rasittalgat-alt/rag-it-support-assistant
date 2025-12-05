@@ -170,4 +170,10 @@ Example FAQ in YAML:
     1. Open Wi-Fi settings.
     2. Select the network "CORP-WIFI".
     3. Use your corporate username and password.
+
+```
+## 6. Demo Video
+
+Demo video: https://drive.google.com/file/d/18lQ22A_FBnZI2WKigvOf1ep35m-40sZS/view?usp=sharing 
+
     4. Accept the security certificate if prompted.
