@@ -73,12 +73,12 @@ This project implements a classic RAG pipeline:
 ### 4.1. High-Level Components
 
 1. **User Interface (UI)**
-   - Simple web UI (Streamlit) or CLI.
+   - Simple web UI (Streamlit).
    - Input: user question.
    - Output: AI answer and optionally sources (titles / IDs of documents).
 
 2. **Embeddings Client**
-   - Wrapper for an embedding model (e.g. `text-embedding-3-small` or `text-embedding-ada-002`).
+   - Wrapper for an embedding model (e.g. `text-embedding-3-small`).
    - Responsibilities:
      - create embeddings for chunks when building the dataset;
      - create embeddings for user query at runtime.
