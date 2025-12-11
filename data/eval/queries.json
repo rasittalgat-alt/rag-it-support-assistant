@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q1",
+    "question": "How can I connect to corporate Wi-Fi on Windows?",
+    "category": "wifi",
+    "gold_source_id": "faq_wifi_001"
+  },
+  {
+    "id": "q2",
+    "question": "I see the CORP-WIFI network but cannot connect. What should I check?",
+    "category": "wifi",
+    "gold_source_id": "faq_wifi_002"
+  },
+  {
+    "id": "q3",
+    "question": "How can I connect to corporate VPN from home on Windows?",
+    "category": "vpn",
+    "gold_source_id": "faq_vpn_001"
+  },
+  {
+    "id": "q4",
+    "question": "My VPN connects but internal websites do not open. What should I do?",
+    "category": "vpn",
+    "gold_source_id": "faq_vpn_002"
+  },
+  {
+    "id": "q5",
+    "question": "Outlook cannot connect to my corporate email from home network.",
+    "category": "email",
+    "gold_source_id": "INC-00123"
+  },
+  {
+    "id": "q6",
+    "question": "How do I reset my corporate account password?",
+    "category": "account",
+    "gold_source_id": "faq_password_001"
+  },
+  {
+    "id": "q7",
+    "question": "My print jobs stay in the queue on printer PRN-01 and do not print.",
+    "category": "printer",
+    "gold_source_id": "INC-00126"
+  },
+  {
+    "id": "q8",
+    "question": "I need a step-by-step guide to connect a Windows laptop to CORP-WIFI.",
+    "category": "wifi",
+    "gold_source_id": "runbook_wifi_windows"
+  },
+  {
+    "id": "q9",
+    "question": "How do I use Cisco AnyConnect to connect to the corporate VPN?",
+    "category": "vpn",
+    "gold_source_id": "runbook_vpn_windows"
+  },
+  {
+    "id": "q10",
+    "question": "What is the target resolution time for a P1 critical incident?",
+    "category": "it",
+    "gold_source_id": "policy_it_sla"
+  },
+  {
+    "id": "q11",
+    "question": "What are the password complexity requirements for corporate accounts?",
+    "category": "password",
+    "gold_source_id": "policy_password_policy"
+  },
+  {
+    "id": "q12",
+    "question": "How can I access my corporate email from a web browser?",
+    "category": "email",
+    "gold_source_id": "faq_email_001"
+  }
+]
