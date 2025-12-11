@@ -71,10 +71,14 @@ class LLMClient:
 
         system_prompt = (
             "You are an IT Support assistant. "
-            "Use ONLY the information from the provided context to answer the question. "
-            "If the answer is not contained in the context, say that you don't know "
+            "Use the provided context as the main source of truth to answer the question. "
+            "The user question may contain typos or be more general than the examples in the context. "
+            "If the context is related to the question, use it and generalize from it to provide "
+            "the best possible practical answer. "
+            "Only if the context is clearly unrelated to the question, say that you don't know "
             "and suggest contacting IT Support."
         )
+
 
         user_content = (
             f"CONTEXT:\n{context_text}\n\n"
