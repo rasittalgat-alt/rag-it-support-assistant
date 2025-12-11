@@ -60,24 +60,42 @@ class RAGPipeline:
 
         return docs
 
-    def answer_question(self, question: str) -> Dict[str, Any]:
+    def answer_question(self, question: str, temperature: float = 0.1) -> Dict[str, Any]:
         """
-        Высокоуровневая функция:
-        - делает retrieve,
-        - потом generate,
-        - возвращает и ответ, и использованный контекст.
+        Полный цикл RAG:
+        - нормализуем вопрос (исправляем частые опечатки),
+        - ищем контекст,
+        - отправляем НОРМАЛИЗОВАННЫЙ вопрос и контекст в LLM,
+        - возвращаем ответ + использованный контекст.
         """
+
+        # 1. Нормализуем вопрос (для поиска и для LLM)
+        normalized_question = normalize_question(question)
+
+        # 2. Получаем документы (retrieve уже внутри тоже нормализует,
+        # но можно оставить как есть — лишний вызов normalize_question не страшен)
         docs = self.retrieve(question)
-        answer = self.llm_client.generate_answer(
-            question=question,
-            context_chunks=docs,
+
+        # 3. Собираем контекст
+        context_text = "\n\n".join(
+            d["text"] for d in docs if d.get("text")
         )
 
+        # 4. Спрашиваем LLM, используя нормализованный вопрос
+        answer = self.llm_client.ask(
+            question=normalized_question,
+            context=context_text,
+            temperature=temperature,
+        )
+
+        # 5. Возвращаем и оригинальный, и нормализованный вопрос (на будущее может пригодиться)
         return {
-            "question": question,
             "answer": answer,
-            "documents": docs,
+            "question": question,
+            "normalized_question": normalized_question,
+            "docs": docs,
         }
+
 
 
 if __name__ == "__main__":
