@@ -138,11 +138,11 @@ def compute_hits_for_query_with_category(
 
 
 
-def evaluate_baseline(top_ks: List[int] = [1, 3, 5]) -> None:
+def evaluate(top_ks: List[int] = [1, 3, 5]) -> None:
     """
-    Базовая оценка (baseline):
-    - без фильтров по категории,
-    - чистый vector search, как сейчас в RAG.
+    Сравнение:
+    - baseline retrieval (без фильтров);
+    - category-aware retrieval (с фильтром по категории, если она распознана).
     """
     queries = load_eval_queries()
     print(f"Loaded {len(queries)} eval queries")
@@ -151,14 +151,15 @@ def evaluate_baseline(top_ks: List[int] = [1, 3, 5]) -> None:
     vec_client = VectorDBClient(vector_size=1536)
 
     # Для каждого k собираем список 0/1
-    stats: Dict[int, List[int]] = {k: [] for k in top_ks}
+    stats_baseline: Dict[int, List[int]] = {k: [] for k in top_ks}
+    stats_category: Dict[int, List[int]] = {k: [] for k in top_ks}
 
     for q in queries:
         qid = q["id"]
         question = q["question"]
         gold_source_id = q["gold_source_id"]
 
-        hits = compute_hits_for_query(
+        baseline_hits = compute_hits_for_query(
             question=question,
             gold_source_id=gold_source_id,
             emb_client=emb_client,
@@ -166,22 +167,41 @@ def evaluate_baseline(top_ks: List[int] = [1, 3, 5]) -> None:
             top_ks=top_ks,
         )
 
-        # Можно включить отладочный вывод по каждому запросу
+        category_hits = compute_hits_for_query_with_category(
+            question=question,
+            gold_source_id=gold_source_id,
+            emb_client=emb_client,
+            vec_client=vec_client,
+            top_ks=top_ks,
+        )
+
         print(f"\nQuery {qid}: {question}")
         print(f"  gold_source_id = {gold_source_id}")
+        print(f"  predicted_category = {classify_category(question)}")
         for k in top_ks:
-            print(f"  Hit@{k}: {hits[k]}")
+            print(f"  Baseline Hit@{k}: {baseline_hits[k]}")
+        for k in top_ks:
+            print(f"  Category-aware Hit@{k}: {category_hits[k]}")
 
         for k in top_ks:
-            stats[k].append(hits[k])
+            stats_baseline[k].append(baseline_hits[k])
+            stats_category[k].append(category_hits[k])
 
-    print("\n=== Baseline Retrieval Metrics ===")
     total = len(queries)
+
+    print("\n=== Retrieval Metrics (Baseline) ===")
     for k in top_ks:
-        hit_sum = sum(stats[k])
+        hit_sum = sum(stats_baseline[k])
+        hit_rate = hit_sum / total if total > 0 else 0.0
+        print(f"Hit@{k}: {hit_sum}/{total} = {hit_rate:.3f}")
+
+    print("\n=== Retrieval Metrics (Category-aware) ===")
+    for k in top_ks:
+        hit_sum = sum(stats_category[k])
         hit_rate = hit_sum / total if total > 0 else 0.0
         print(f"Hit@{k}: {hit_sum}/{total} = {hit_rate:.3f}")
 
 
+
 if __name__ == "__main__":
-    evaluate_baseline()
+    evaluate()
