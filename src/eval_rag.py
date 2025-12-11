@@ -15,6 +15,51 @@ def load_eval_queries() -> List[Dict[str, Any]]:
         return json.load(f)
 
 
+def classify_category(question: str) -> str | None:
+    """
+    Очень простой rule-based классификатор категории по тексту вопроса.
+    Категории должны совпадать с тем, что хранится в payload['category'].
+    """
+    q = question.lower()
+
+    # Wi-Fi / сеть
+    if "wifi" in q or "wi-fi" in q or "wireless" in q:
+        return "wifi"
+
+    # VPN
+    if "vpn" in q or "anyconnect" in q:
+        return "vpn"
+
+    # Email / Outlook
+    if "outlook" in q or "email" in q or "mail" in q or "webmail" in q:
+        return "email"
+
+    # Принтеры
+    if "printer" in q or "print " in q or "print job" in q:
+        return "printer"
+
+    # SLA / политики
+    if "sla" in q or "priority" in q or "p1" in q or "critical incident" in q:
+        return "policy"
+
+    # Политика паролей
+    if "password" in q and (
+        "complexity" in q
+        or "requirement" in q
+        or "requirements" in q
+        or "rules" in q
+        or "policy" in q
+    ):
+        return "policy"
+
+    # Аккаунт / обычный password reset
+    if "password" in q or "account" in q or "login" in q:
+        return "account"
+
+    return None
+
+
+
 def compute_hits_for_query(
     question: str,
     gold_source_id: str,
