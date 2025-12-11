@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 from .embeddings_client import EmbeddingsClient
 from .vector_db_client import VectorDBClient
 from .llm_client import LLMClient
+from .text_utils import normalize_question
 
 
 class RAGPipeline:
@@ -23,17 +24,28 @@ class RAGPipeline:
         """
         Возвращает top_k чанков из Qdrant в формате:
         [
-          {
-            "text": "...",
-            "metadata": {...},
-            "score": 0.98
-          },
-          ...
+            {
+                "text": "...",
+                "metadata": {...},
+                "score": 0.98,
+            },
+            ...
         ]
         """
-        query_vector = self.emb_client.embed_text(question)
-        results = self.vec_client.search(query_vector=query_vector, limit=self.top_k)
 
+        # 1. Нормализуем вопрос (исправляем частые опечатки)
+        normalized_question = normalize_question(question)
+
+        # 2. Делаем эмбеддинг уже нормализованного текста
+        query_vector = self.emb_client.embed_text(normalized_question)
+
+        # 3. Ищем похожие вектора в Qdrant
+        results = self.vec_client.search(
+            query_vector=query_vector,
+            limit=self.top_k,
+        )
+
+        # 4. Приводим результаты к удобному формату
         docs: List[Dict[str, Any]] = []
         for hit in results:
             payload = hit.payload or {}
@@ -45,6 +57,7 @@ class RAGPipeline:
                     "score": hit.score,
                 }
             )
+
         return docs
 
     def answer_question(self, question: str) -> Dict[str, Any]:
