@@ -92,6 +92,52 @@ def compute_hits_for_query(
     return hits
 
 
+def compute_hits_for_query_with_category(
+    question: str,
+    gold_source_id: str,
+    emb_client: EmbeddingsClient,
+    vec_client: VectorDBClient,
+    top_ks: List[int],
+) -> Dict[int, int]:
+    """
+    То же самое, что compute_hits_for_query, но:
+    - сначала определяем категорию вопроса,
+    - если нашли category, делаем search_with_category,
+    - иначе fallback на обычный search().
+    """
+    query_vector = emb_client.embed_text(question)
+    max_k = max(top_ks)
+
+    category = classify_category(question)
+
+    if category:
+        results = vec_client.search_with_category(
+            query_vector=query_vector,
+            category=category,
+            limit=max_k,
+            with_payload=True,
+        )
+    else:
+        results = vec_client.search(
+            query_vector=query_vector,
+            limit=max_k,
+            with_payload=True,
+        )
+
+    retrieved_source_ids: List[str | None] = []
+    for hit in results:
+        payload = hit.payload or {}
+        retrieved_source_ids.append(payload.get("source_id"))
+
+    hits: Dict[int, int] = {}
+    for k in top_ks:
+        subset = retrieved_source_ids[:k]
+        hits[k] = 1 if gold_source_id in subset else 0
+
+    return hits
+
+
+
 def evaluate_baseline(top_ks: List[int] = [1, 3, 5]) -> None:
     """
     Базовая оценка (baseline):
