@@ -90,4 +90,44 @@ class VectorDBClient:
         # В res лежит объект с полем .points (список ScoredPoint)
         return res.points
 
+    def search_with_category(
+        self,
+        query_vector: List[float],
+        category: str | None,
+        limit: int = 5,
+        with_payload: bool = True,
+    ):
+        """
+        Поиск с фильтром по категории (payload['category']).
+
+        Если category = None или пустая строка — просто fallback на обычный search().
+        """
+
+        if not category:
+            return self.search(
+                query_vector=query_vector,
+                limit=limit,
+                with_payload=with_payload,
+            )
+
+        qfilter = qm.Filter(
+            must=[
+                qm.FieldCondition(
+                    key="category",
+                    match=qm.MatchValue(value=category),
+                )
+            ]
+        )
+
+        res = self.client.query_points(
+            collection_name=self.collection_name,
+            query=query_vector,
+            query_filter=qfilter,
+            with_payload=with_payload,
+            limit=limit,
+        )
+
+        return res.points
+
+
 
