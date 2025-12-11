@@ -87,6 +87,7 @@ class RAGPipeline:
             "answer": answer,
             "question": question,
             "normalized_question": normalized_question,
+            "documents": docs,  # 🔹 для совместимости со Streamlit
             "docs": docs,
         }
 
