@@ -64,31 +64,25 @@ class RAGPipeline:
         """
         Полный цикл RAG:
         - нормализуем вопрос (исправляем частые опечатки),
-        - ищем контекст,
-        - отправляем НОРМАЛИЗОВАННЫЙ вопрос и контекст в LLM,
+        - ищем top_k релевантных чанков,
+        - отправляем нормализованный вопрос и список чанков в LLM,
         - возвращаем ответ + использованный контекст.
         """
 
         # 1. Нормализуем вопрос (для поиска и для LLM)
         normalized_question = normalize_question(question)
 
-        # 2. Получаем документы (retrieve уже внутри тоже нормализует,
-        # но можно оставить как есть — лишний вызов normalize_question не страшен)
-        docs = self.retrieve(question)
+        # 2. Получаем документы из Qdrant (retrieve уже собирает их в нужный формат)
+        docs: List[Dict[str, Any]] = self.retrieve(question)
 
-        # 3. Собираем контекст
-        context_text = "\n\n".join(
-            d["text"] for d in docs if d.get("text")
-        )
-
-        # 4. Спрашиваем LLM, используя нормализованный вопрос
+        # 3. Генерируем ответ, используя НОРМАЛИЗОВАННЫЙ вопрос и чанки как контекст
         answer = self.llm_client.generate_answer(
             question=normalized_question,
-            context=context_text,
+            context_chunks=docs,
             temperature=temperature,
         )
 
-        # 5. Возвращаем и оригинальный, и нормализованный вопрос (на будущее может пригодиться)
+        # 4. Возвращаем всё, что нужно UI
         return {
             "answer": answer,
             "question": question,
