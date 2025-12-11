@@ -40,7 +40,7 @@ def classify_category(question: str) -> str | None:
 
     # SLA / политики
     if "sla" in q or "priority" in q or "p1" in q or "critical incident" in q:
-        return "policy"
+        return "it"
 
     # Политика паролей
     if "password" in q and (
@@ -50,7 +50,7 @@ def classify_category(question: str) -> str | None:
         or "rules" in q
         or "policy" in q
     ):
-        return "policy"
+        return "password"
 
     # Аккаунт / обычный password reset
     if "password" in q or "account" in q or "login" in q:
