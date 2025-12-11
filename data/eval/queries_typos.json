@@ -2,31 +2,26 @@
   {
     "id": "t1",
     "question": "How to work with preinters?",
-    "category": "printer",
     "gold_source_id": "INC-00126"
   },
   {
     "id": "t2",
     "question": "Wfi connection to CORP-WIFI is unstable on my laptop.",
-    "category": "wifi",
     "gold_source_id": "faq_wifi_002"
   },
   {
     "id": "t3",
     "question": "How can I connect to corporate vnp from home?",
-    "category": "vpn",
     "gold_source_id": "faq_vpn_001"
   },
   {
     "id": "t4",
     "question": "Eamil on Outlook does not sync on home network.",
-    "category": "email",
     "gold_source_id": "INC-00123"
   },
   {
     "id": "t5",
     "question": "What are the passwrod complexity requirements for corporate accounts?",
-    "category": "password",
     "gold_source_id": "policy_password_policy"
   }
 ]
