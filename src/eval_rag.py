@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 
 from .embeddings_client import EmbeddingsClient
 from .vector_db_client import VectorDBClient
+from .text_utils import normalize_question
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -17,32 +18,29 @@ def load_eval_queries() -> List[Dict[str, Any]]:
 
 def classify_category(question: str) -> str | None:
     """
-    Очень простой rule-based классификатор категории по тексту вопроса.
-    Категории должны совпадать с тем, что хранится в payload['category'].
+    Rule-based классификатор.
+    Используем нормализованный текст, чтобы ловить опечатки.
     """
-    q = question.lower()
-
-    # Wi-Fi / сеть
+    q = normalize_question(question)  # <<-- вот так
+    # дальше логика как раньше,
+    # но с учётом фикса для policy/it/password:
     if "wifi" in q or "wi-fi" in q or "wireless" in q:
         return "wifi"
 
-    # VPN
     if "vpn" in q or "anyconnect" in q:
         return "vpn"
 
-    # Email / Outlook
     if "outlook" in q or "email" in q or "mail" in q or "webmail" in q:
         return "email"
 
-    # Принтеры
-    if "printer" in q or "print " in q or "print job" in q:
+    if "printer" in q or "printers" in q or "print " in q or "print job" in q:
         return "printer"
 
-    # SLA / политики
+    # SLA (it_sla.md -> category = "it")
     if "sla" in q or "priority" in q or "p1" in q or "critical incident" in q:
         return "it"
 
-    # Политика паролей
+    # password_policy.md -> "password"
     if "password" in q and (
         "complexity" in q
         or "requirement" in q
@@ -52,11 +50,11 @@ def classify_category(question: str) -> str | None:
     ):
         return "password"
 
-    # Аккаунт / обычный password reset
-    if "password" in q or "account" in q or "login" in q:
+    if "account" in q or "login" in q:
         return "account"
 
     return None
+
 
 
 
