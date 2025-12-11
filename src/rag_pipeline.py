@@ -82,7 +82,7 @@ class RAGPipeline:
         )
 
         # 4. Спрашиваем LLM, используя нормализованный вопрос
-        answer = self.llm_client.ask(
+        answer = self.llm_client.generate_answer(
             question=normalized_question,
             context=context_text,
             temperature=temperature,
